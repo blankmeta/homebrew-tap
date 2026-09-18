@@ -1,0 +1,86 @@
+class CodexSwitch < Formula
+  desc "Switch ChatGPT accounts for Codex with an optional VLESS proxy"
+  homepage "https://github.com/blankmeta/codex-switch"
+  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "e11376c1aaebf9867585bb7cb9b08653c25ffbf2b633e2747b04684b5ebd7d4e"
+
+  depends_on :macos
+  depends_on "node"
+  depends_on "python@3.13"
+  depends_on "xray"
+
+  on_arm do
+    resource "codex-cli" do
+      url "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-aarch64-apple-darwin.tar.gz"
+      sha256 "287e2dd0a9bbfb58581b0a9150399458b4f094ea42caf02860f1e8cb5a202a0b"
+    end
+
+    resource "codex-auth" do
+      url "https://registry.npmjs.org/@loongphy/codex-auth-darwin-arm64/-/codex-auth-darwin-arm64-0.3.0.tgz"
+      sha256 "d19cdcbfe7e7bdb5929205bfa19a01fa5753ed14565fd58db3ceae4375e83e96"
+    end
+  end
+
+  on_intel do
+    resource "codex-cli" do
+      url "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-apple-darwin.tar.gz"
+      sha256 "6e3876e7f4edff2e3dee545e1d3b2334866791a8dfce7e25789bf6799355a4ea"
+    end
+
+    resource "codex-auth" do
+      url "https://registry.npmjs.org/@loongphy/codex-auth-darwin-x64/-/codex-auth-darwin-x64-0.3.0.tgz"
+      sha256 "d2455c9729428256d84a80ad0ceeaa33af507cc9850e3e0835da420ab67f1e6c"
+    end
+  end
+
+  def install
+    libexec.install "src"
+    resource("codex-cli").stage do
+      (libexec/"codex").install Dir["*"]
+    end
+    resource("codex-auth").stage do
+      (libexec/"auth").install "bin"
+      (pkgshare/"licenses").install "LICENSE" => "codex-auth-LICENSE"
+    end
+    bin.mkpath
+    { "codex-switch" => "codex_switch", "codex-proxy" => "codex_switch.compat" }.each do |name, module_name|
+      (bin/name).write <<~SH
+        #!/bin/sh
+        export PATH="#{libexec}/codex/bin:#{libexec}/auth/bin:#{Formula["node"].opt_bin}:#{Formula["xray"].opt_bin}:$PATH"
+        export CODEX_AUTH_NODE_EXECUTABLE="#{Formula["node"].opt_bin}/node"
+        export PYTHONPATH="#{libexec}/src"
+        exec "#{Formula["python@3.13"].opt_bin}/python3.13" -m #{module_name} "$@"
+      SH
+      (bin/name).chmod 0755
+    end
+    bin.install_symlink "codex-switch" => "codex-vpn"
+    doc.install "README.md", "docs"
+  end
+
+  def caveats
+    <<~EOS
+      Start the guided setup and account picker:
+        codex-switch
+
+      For Russian prompts:
+        CODEX_SWITCH_LANG=ru codex-switch
+
+      Existing codex-auth accounts and codex-vpn VLESS settings are detected.
+      No shell configuration is required. Proxy use is optional.
+    EOS
+  end
+
+  test do
+    ENV["CODEX_SWITCH_HOME"] = (testpath/"settings").to_s
+    ENV["CODEX_HOME"] = (testpath/"codex").to_s
+    ENV["CODEX_SWITCH_LANG"] = "en"
+    (testpath/"codex").mkpath
+    assert_match version.to_s, shell_output("#{bin}/codex-switch --version")
+    assert_match version.to_s, shell_output("#{bin}/codex-vpn --version")
+    assert_match "Ready", pipe_output("#{bin}/codex-switch setup", "1\n", 0)
+    assert_equal false, JSON.parse((testpath/"settings/settings.json").read)["proxy_enabled"]
+    assert_match "No accounts yet", shell_output("#{bin}/codex-switch accounts")
+    assert_match "Normal connection", shell_output("#{bin}/codex-switch doctor")
+    assert_match "Codex Switch", shell_output("#{bin}/codex-proxy --help")
+  end
+end
