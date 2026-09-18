@@ -1,8 +1,10 @@
 class CodexSwitch < Formula
-  desc "Switch ChatGPT accounts for Codex with an optional VLESS proxy"
+  desc "Isolated ChatGPT account profiles and usage limits for Codex"
   homepage "https://github.com/blankmeta/codex-switch"
-  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "e11376c1aaebf9867585bb7cb9b08653c25ffbf2b633e2747b04684b5ebd7d4e"
+  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "4a35d447d0caf51fac250d337be61cff804f8e2a9726aafcdda6788c2063c2c3"
+
+  license "MIT"
 
   depends_on :macos
   depends_on "node"
@@ -54,7 +56,8 @@ class CodexSwitch < Formula
       (bin/name).chmod 0755
     end
     bin.install_symlink "codex-switch" => "codex-vpn"
-    doc.install "README.md", "docs"
+    prefix.install "LICENSE"
+    doc.install "README.md", "CHANGELOG.md", "docs"
   end
 
   def caveats
@@ -65,7 +68,14 @@ class CodexSwitch < Formula
       For Russian prompts:
         CODEX_SWITCH_LANG=ru codex-switch
 
-      Existing codex-auth accounts and codex-vpn VLESS settings are detected.
+      Add an isolated work profile and remember it for this project:
+        codex-switch login work
+        codex-switch bind work
+
+      Original accounts and shared history remain available:
+        codex-switch legacy
+
+      Existing codex-vpn VLESS settings are detected.
       No shell configuration is required. Proxy use is optional.
     EOS
   end
@@ -80,6 +90,11 @@ class CodexSwitch < Formula
     assert_match "Ready", pipe_output("#{bin}/codex-switch setup", "1\n", 0)
     assert_equal false, JSON.parse((testpath/"settings/settings.json").read)["proxy_enabled"]
     assert_match "No accounts yet", shell_output("#{bin}/codex-switch accounts")
+    status = JSON.parse(shell_output("#{bin}/codex-switch status --json"))
+    assert_equal 1, status["schema_version"]
+    assert_equal [], status["profiles"]
+    assert_nil status["project"]["profile"]
+    assert_match "Codex: no profiles", shell_output("#{bin}/codex-switch status --line")
     assert_match "Normal connection", shell_output("#{bin}/codex-switch doctor")
     assert_match "Codex Switch", shell_output("#{bin}/codex-proxy --help")
   end

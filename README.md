@@ -2,7 +2,7 @@
 
 ## Codex Switch
 
-Choose a ChatGPT account for Codex, see usage limits, and optionally connect over VLESS.
+Run isolated ChatGPT account profiles for Codex, remember a profile per project, and see usage limits. VLESS is optional.
 
 ```sh
 brew install blankmeta/tap/codex-switch
