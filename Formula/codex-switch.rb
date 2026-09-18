@@ -1,8 +1,8 @@
 class CodexSwitch < Formula
-  desc "Isolated ChatGPT account profiles and usage limits for Codex"
+  desc "ChatGPT accounts, limits and Codex sessions in one terminal menu"
   homepage "https://github.com/blankmeta/codex-switch"
-  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.2.0.tar.gz"
-  sha256 "4a35d447d0caf51fac250d337be61cff804f8e2a9726aafcdda6788c2063c2c3"
+  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "2258f2387e0e134eb9577d8b7861f0c3e343493ed9e3c1467ec4e469d9d589c2"
 
   license "MIT"
 
@@ -62,18 +62,15 @@ class CodexSwitch < Formula
 
   def caveats
     <<~EOS
-      Start the guided setup and account picker:
+      Open your accounts, limits and settings:
         codex-switch
 
       For Russian prompts:
         CODEX_SWITCH_LANG=ru codex-switch
 
-      Add an isolated work profile and remember it for this project:
-        codex-switch login work
-        codex-switch bind work
-
-      Original accounts and shared history remain available:
-        codex-switch legacy
+      Choose with the arrow keys and press Enter to launch.
+      Press Right on an account for its actions and project preference.
+      Add accounts and configure an optional VLESS connection from the menu.
 
       Existing codex-vpn VLESS settings are detected.
       No shell configuration is required. Proxy use is optional.
