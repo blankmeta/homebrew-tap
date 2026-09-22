@@ -1,8 +1,9 @@
-class CodexSwitch < Formula
-  desc "ChatGPT accounts, limits and Codex sessions in one terminal menu"
-  homepage "https://github.com/blankmeta/codex-switch"
-  url "https://github.com/blankmeta/codex-switch/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "2258f2387e0e134eb9577d8b7861f0c3e343493ed9e3c1467ec4e469d9d589c2"
+class CodexLobby < Formula
+  include Language::Python::Virtualenv
+  desc "Codex and Claude accounts, limits and sessions in one terminal menu"
+  homepage "https://github.com/blankmeta/codex-lobby"
+  url "https://github.com/blankmeta/codex-lobby/archive/refs/tags/v2.0.1.tar.gz"
+  sha256 "1ececf462ba7aceaec83b1d9febd4a2b6de1fcf607e773e7ac08f6374399f535"
 
   license "MIT"
 
@@ -35,7 +36,14 @@ class CodexSwitch < Formula
     end
   end
 
+  resource "psutil" do
+    url "https://files.pythonhosted.org/packages/aa/c6/d1ddf4abb55e93cebc4f2ed8b5d6dbad109ecb8d63748dd2b20ab5e57ebe/psutil-7.2.2.tar.gz"
+    sha256 "0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"
+  end
+
   def install
+    venv = virtualenv_create(libexec/"venv", Formula["python@3.13"].opt_bin/"python3.13")
+    venv.pip_install resource("psutil")
     libexec.install "src"
     resource("codex-cli").stage do
       (libexec/"codex").install Dir["*"]
@@ -45,17 +53,17 @@ class CodexSwitch < Formula
       (pkgshare/"licenses").install "LICENSE" => "codex-auth-LICENSE"
     end
     bin.mkpath
-    { "codex-switch" => "codex_switch", "codex-proxy" => "codex_switch.compat" }.each do |name, module_name|
+    { "codex-lobby" => "codex_switch", "codex-proxy" => "codex_switch.compat" }.each do |name, module_name|
       (bin/name).write <<~SH
         #!/bin/sh
         export PATH="#{libexec}/codex/bin:#{libexec}/auth/bin:#{Formula["node"].opt_bin}:#{Formula["xray"].opt_bin}:$PATH"
         export CODEX_AUTH_NODE_EXECUTABLE="#{Formula["node"].opt_bin}/node"
         export PYTHONPATH="#{libexec}/src"
-        exec "#{Formula["python@3.13"].opt_bin}/python3.13" -m #{module_name} "$@"
+        exec "#{libexec}/venv/bin/python3.13" -m #{module_name} "$@"
       SH
       (bin/name).chmod 0755
     end
-    bin.install_symlink "codex-switch" => "codex-vpn"
+    %w[cxl codex-switch codex-vpn].each { |name| bin.install_symlink "codex-lobby" => name }
     prefix.install "LICENSE"
     doc.install "README.md", "CHANGELOG.md", "docs"
   end
@@ -63,14 +71,15 @@ class CodexSwitch < Formula
   def caveats
     <<~EOS
       Open your accounts, limits and settings:
-        codex-switch
+        cxl
 
       For Russian prompts:
-        CODEX_SWITCH_LANG=ru codex-switch
+        CODEX_LOBBY_LANG=ru cxl
 
       Choose with the arrow keys and press Enter to launch.
       Press Right on an account for its actions and project preference.
-      Add accounts and configure an optional VLESS connection from the menu.
+      Add ChatGPT or Claude accounts from the menu. Missing tools install automatically.
+      Optional VLESS: Settings -> Connection.
 
       Existing codex-vpn VLESS settings are detected.
       No shell configuration is required. Proxy use is optional.
@@ -83,6 +92,8 @@ class CodexSwitch < Formula
     ENV["CODEX_SWITCH_LANG"] = "en"
     (testpath/"codex").mkpath
     assert_match version.to_s, shell_output("#{bin}/codex-switch --version")
+    assert_match version.to_s, shell_output("#{bin}/codex-lobby --version")
+    assert_match version.to_s, shell_output("#{bin}/cxl --version")
     assert_match version.to_s, shell_output("#{bin}/codex-vpn --version")
     assert_match "Ready", pipe_output("#{bin}/codex-switch setup", "1\n", 0)
     assert_equal false, JSON.parse((testpath/"settings/settings.json").read)["proxy_enabled"]
@@ -93,6 +104,6 @@ class CodexSwitch < Formula
     assert_nil status["project"]["profile"]
     assert_match "Codex: no profiles", shell_output("#{bin}/codex-switch status --line")
     assert_match "Normal connection", shell_output("#{bin}/codex-switch doctor")
-    assert_match "Codex Switch", shell_output("#{bin}/codex-proxy --help")
+    assert_match "Codex Lobby", shell_output("#{bin}/codex-proxy --help")
   end
 end

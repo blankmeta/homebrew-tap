@@ -1,18 +1,20 @@
 # blankmeta Homebrew tap
 
-## Codex Switch
+## Codex Lobby
 
-Run isolated ChatGPT account profiles for Codex, remember a profile per project, and see usage limits. VLESS is optional.
+Your Codex and Claude accounts, limits, and sessions in one terminal menu. Choose an account with the arrow keys and press Enter.
 
 ```sh
-brew install blankmeta/tap/codex-switch
-codex-switch
+brew install blankmeta/tap/codex-lobby
+cxl
 ```
 
-The first run guides you through connection setup and ChatGPT sign-in. Dependencies install automatically. Supports Apple Silicon and Intel Macs.
+Choose **Add account → ChatGPT or Claude**, then sign in in your browser. Missing tools install automatically. VLESS is optional. Supports Apple Silicon and Intel Macs.
 
-[Project and instructions](https://github.com/blankmeta/codex-switch)
+[Project and instructions](https://github.com/blankmeta/codex-lobby)
 
 The formula bundles pinned Codex CLI and codex-auth versions in its own installation directory, without replacing globally installed commands. Python, Node, and Xray are Homebrew dependencies. All source archives and resources have SHA-256 checksums.
 
-Update with `brew update && brew upgrade blankmeta/tap/codex-switch`.
+Update with `brew update && brew upgrade blankmeta/tap/codex-lobby`.
+
+Run `cxl` to choose a Codex or Claude account. Previous Codex Switch installations migrate through Homebrew; existing account data stays in place.
