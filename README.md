@@ -13,7 +13,7 @@ Choose **Add account → ChatGPT or Claude**, then sign in in your browser. Miss
 
 [Project and instructions](https://github.com/blankmeta/runlobby)
 
-The formula bundles pinned Codex CLI and codex-auth versions in its own installation directory, without replacing globally installed commands. Python, Node, and Xray are Homebrew dependencies. All source archives and resources have SHA-256 checksums.
+Homebrew installs a verified standalone build with its Python runtime included. It does not upgrade global Node, Python or Xray packages. RunLobby prepares missing native tools when you choose a provider. Apple Silicon and Intel archives have separate SHA-256 checksums.
 
 Update with `brew update && brew upgrade blankmeta/tap/runlobby`.
 

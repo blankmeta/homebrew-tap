@@ -1,0 +1,26 @@
+name: Install formula
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_INSTALL_CLEANUP: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use the formula from this checkout
+        run: |
+          brew tap blankmeta/tap
+          cp Formula/runlobby.rb "$(brew --repository blankmeta/tap)/Formula/runlobby.rb"
+      - run: brew install blankmeta/tap/runlobby
+      - run: brew test blankmeta/tap/runlobby
+      - run: rlb --version
