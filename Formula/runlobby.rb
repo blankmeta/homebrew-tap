@@ -1,11 +1,12 @@
-class CodexLobby < Formula
+class Runlobby < Formula
   include Language::Python::Virtualenv
   desc "Codex and Claude accounts, limits and sessions in one terminal menu"
-  homepage "https://github.com/blankmeta/codex-lobby"
-  url "https://github.com/blankmeta/codex-lobby/archive/refs/tags/v2.0.1.tar.gz"
-  sha256 "1ececf462ba7aceaec83b1d9febd4a2b6de1fcf607e773e7ac08f6374399f535"
+  homepage "https://github.com/blankmeta/runlobby"
+  url "https://github.com/blankmeta/runlobby/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "2a0c63ef32a4be26e2288253a435232d5a20e7e9dcc0d44424ac541248044852"
 
   license "MIT"
+  version_scheme 1
 
   depends_on :macos
   depends_on "node"
@@ -53,7 +54,7 @@ class CodexLobby < Formula
       (pkgshare/"licenses").install "LICENSE" => "codex-auth-LICENSE"
     end
     bin.mkpath
-    { "codex-lobby" => "codex_switch", "codex-proxy" => "codex_switch.compat" }.each do |name, module_name|
+    { "runlobby" => "codex_switch", "codex-proxy" => "codex_switch.compat" }.each do |name, module_name|
       (bin/name).write <<~SH
         #!/bin/sh
         export PATH="#{libexec}/codex/bin:#{libexec}/auth/bin:#{Formula["node"].opt_bin}:#{Formula["xray"].opt_bin}:$PATH"
@@ -63,7 +64,7 @@ class CodexLobby < Formula
       SH
       (bin/name).chmod 0755
     end
-    %w[cxl codex-switch codex-vpn].each { |name| bin.install_symlink "codex-lobby" => name }
+    %w[rlb codex-lobby cxl codex-switch codex-vpn].each { |name| bin.install_symlink "runlobby" => name }
     prefix.install "LICENSE"
     doc.install "README.md", "CHANGELOG.md", "docs"
   end
@@ -71,10 +72,10 @@ class CodexLobby < Formula
   def caveats
     <<~EOS
       Open your accounts, limits and settings:
-        cxl
+        rlb
 
       For Russian prompts:
-        CODEX_LOBBY_LANG=ru cxl
+        RUNLOBBY_LANG=ru rlb
 
       Choose with the arrow keys and press Enter to launch.
       Press Right on an account for its actions and project preference.
@@ -87,11 +88,13 @@ class CodexLobby < Formula
   end
 
   test do
-    ENV["CODEX_SWITCH_HOME"] = (testpath/"settings").to_s
+    ENV["RUNLOBBY_HOME"] = (testpath/"settings").to_s
     ENV["CODEX_HOME"] = (testpath/"codex").to_s
-    ENV["CODEX_SWITCH_LANG"] = "en"
+    ENV["RUNLOBBY_LANG"] = "en"
     (testpath/"codex").mkpath
     assert_match version.to_s, shell_output("#{bin}/codex-switch --version")
+    assert_match version.to_s, shell_output("#{bin}/runlobby --version")
+    assert_match version.to_s, shell_output("#{bin}/rlb --version")
     assert_match version.to_s, shell_output("#{bin}/codex-lobby --version")
     assert_match version.to_s, shell_output("#{bin}/cxl --version")
     assert_match version.to_s, shell_output("#{bin}/codex-vpn --version")
@@ -102,8 +105,8 @@ class CodexLobby < Formula
     assert_equal 1, status["schema_version"]
     assert_equal [], status["profiles"]
     assert_nil status["project"]["profile"]
-    assert_match "Codex: no profiles", shell_output("#{bin}/codex-switch status --line")
+    assert_match "RunLobby: no accounts", shell_output("#{bin}/codex-switch status --line")
     assert_match "Normal connection", shell_output("#{bin}/codex-switch doctor")
-    assert_match "Codex Lobby", shell_output("#{bin}/codex-proxy --help")
+    assert_match "RunLobby", shell_output("#{bin}/codex-proxy --help")
   end
 end

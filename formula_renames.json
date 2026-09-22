@@ -1,3 +1,4 @@
 {
-  "codex-switch": "codex-lobby"
+  "codex-switch": "runlobby",
+  "codex-lobby": "runlobby"
 }
