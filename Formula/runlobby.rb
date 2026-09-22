@@ -1,7 +1,7 @@
 class Runlobby < Formula
   desc "Codex and Claude accounts, limits and sessions in one terminal menu"
   homepage "https://github.com/blankmeta/runlobby"
-  revision 1
+  revision 2
   license "MIT"
   version_scheme 1
 
@@ -55,6 +55,9 @@ class Runlobby < Formula
         #!/bin/sh
         export PATH="#{libexec}/auth/bin:#{libexec}/node/bin:$PATH"
         export CODEX_AUTH_NODE_EXECUTABLE="#{libexec}/node/bin/node"
+        if [ -z "${SSL_CERT_FILE:-}" ] && [ -r /etc/ssl/cert.pem ]; then
+          export SSL_CERT_FILE=/etc/ssl/cert.pem
+        fi
         exec "#{libexec}/#{name}" "$@"
       SH
       (bin/name).chmod 0755
