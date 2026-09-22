@@ -6,12 +6,10 @@ class Runlobby < Formula
 
   depends_on :macos
 
-  on_arm do
+  if Hardware::CPU.arm?
     url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-arm64.tar.gz"
     sha256 "685dac9d1dfdab976ba669e5431fddae4d9b9b000c5d0a27bc157f5fc4c6c36d"
-  end
-
-  on_intel do
+  else
     url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-x64.tar.gz"
     sha256 "4757fb91f9cf2e4e2082838f93e68936b357e48ffcf7319b07b9b5263911281b"
   end
