@@ -7,11 +7,11 @@ class Runlobby < Formula
   depends_on :macos
 
   if Hardware::CPU.arm?
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-arm64.tar.gz"
-    sha256 "685dac9d1dfdab976ba669e5431fddae4d9b9b000c5d0a27bc157f5fc4c6c36d"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.1/runlobby-1.5.1-darwin-arm64.tar.gz"
+    sha256 "8476a1ceef3630d6789f7cd8d8c4c27a63d8fde6639eccdd7181ba5526addcd7"
   else
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-x64.tar.gz"
-    sha256 "4757fb91f9cf2e4e2082838f93e68936b357e48ffcf7319b07b9b5263911281b"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.1/runlobby-1.5.1-darwin-x64.tar.gz"
+    sha256 "6aeeccd5f94ab545d85d384e22f6f83de93693a3e121f40108fdf9044544a536"
   end
 
   on_arm do
@@ -100,6 +100,10 @@ class Runlobby < Formula
     assert_match version.to_s, shell_output("#{bin}/codex-vpn --version")
     assert_match "Ready", pipe_output("#{bin}/codex-switch setup", "1\n", 0)
     assert_equal false, JSON.parse((testpath/"settings/settings.json").read)["proxy_enabled"]
+    assert_match "off", shell_output("#{bin}/rlb monitor off")
+    assert_equal false, JSON.parse((testpath/"settings/settings.json").read)["monitor_enabled"]
+    assert_match "on", shell_output("#{bin}/rlb monitor on")
+    assert_match "on", shell_output("#{bin}/rlb monitor status")
     assert_match "No accounts yet", shell_output("#{bin}/codex-switch accounts")
     status = JSON.parse(shell_output("#{bin}/codex-switch status --json"))
     assert_equal 1, status["schema_version"]
