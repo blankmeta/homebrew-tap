@@ -7,13 +7,13 @@ class Runlobby < Formula
   depends_on :macos
 
   on_arm do
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.2/runlobby-1.4.2-darwin-arm64.tar.gz"
-    sha256 "ac5be74a09d321b04a7f09d2ee156fca045a8549b3bb361eac693c438883b08a"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-arm64.tar.gz"
+    sha256 "685dac9d1dfdab976ba669e5431fddae4d9b9b000c5d0a27bc157f5fc4c6c36d"
   end
 
   on_intel do
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.2/runlobby-1.4.2-darwin-x64.tar.gz"
-    sha256 "c1869ab6365ae53189a50d861f8fae2223f108f27c4226ef01845a48db2c3e72"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.5.0/runlobby-1.5.0-darwin-x64.tar.gz"
+    sha256 "4757fb91f9cf2e4e2082838f93e68936b357e48ffcf7319b07b9b5263911281b"
   end
 
   on_arm do
@@ -74,6 +74,7 @@ class Runlobby < Formula
       Choose with the arrow keys and press Enter to launch.
       Press Right on an account for its actions and project preference.
       Add ChatGPT or Claude accounts from the menu. Missing tools install automatically.
+      Live session statistics appear beside the agent. F8 hides the panel.
       Optional VLESS: Settings -> Connection.
 
       Existing codex-vpn VLESS settings are detected.
