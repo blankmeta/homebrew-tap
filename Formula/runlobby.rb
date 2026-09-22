@@ -1,20 +1,19 @@
 class Runlobby < Formula
   desc "Codex and Claude accounts, limits and sessions in one terminal menu"
   homepage "https://github.com/blankmeta/runlobby"
-  revision 2
   license "MIT"
   version_scheme 1
 
   depends_on :macos
 
   on_arm do
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.1/runlobby-1.4.1-darwin-arm64.tar.gz"
-    sha256 "27b4ed33a6b6267e9ac3ab0ab7ac48bfed35b5dc24aa96856f1b319650cf0122"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.2/runlobby-1.4.2-darwin-arm64.tar.gz"
+    sha256 "ac5be74a09d321b04a7f09d2ee156fca045a8549b3bb361eac693c438883b08a"
   end
 
   on_intel do
-    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.1/runlobby-1.4.1-darwin-x64.tar.gz"
-    sha256 "378b4e25811e94952397fb90cefb3e629d10f4b75b92d8440335a1f519b82de0"
+    url "https://github.com/blankmeta/runlobby/releases/download/v1.4.2/runlobby-1.4.2-darwin-x64.tar.gz"
+    sha256 "c1869ab6365ae53189a50d861f8fae2223f108f27c4226ef01845a48db2c3e72"
   end
 
   on_arm do
