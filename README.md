@@ -13,7 +13,7 @@ Choose **Add account → ChatGPT or Claude**, then sign in in your browser. Miss
 
 [Project and instructions](https://github.com/blankmeta/runlobby)
 
-Homebrew installs a verified standalone build with its Python runtime included. It does not upgrade global Node, Python or Xray packages. RunLobby prepares missing native tools when you choose a provider. Apple Silicon and Intel archives have separate SHA-256 checksums.
+Homebrew installs a verified standalone build with its Python runtime included. A private codex-auth helper and Node runtime keep existing accounts visible even if older tools are installed globally. The formula does not upgrade global Node, Python or Xray packages. RunLobby prepares other missing native tools when you choose a provider. Apple Silicon and Intel archives have separate SHA-256 checksums.
 
 Update with `brew update && brew upgrade blankmeta/tap/runlobby`.
 

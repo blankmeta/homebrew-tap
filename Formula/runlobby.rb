@@ -1,6 +1,7 @@
 class Runlobby < Formula
   desc "Codex and Claude accounts, limits and sessions in one terminal menu"
   homepage "https://github.com/blankmeta/runlobby"
+  revision 1
   license "MIT"
   version_scheme 1
 
@@ -16,11 +17,47 @@ class Runlobby < Formula
     sha256 "378b4e25811e94952397fb90cefb3e629d10f4b75b92d8440335a1f519b82de0"
   end
 
+  on_arm do
+    resource "codex-auth" do
+      url "https://registry.npmjs.org/@loongphy/codex-auth-darwin-arm64/-/codex-auth-darwin-arm64-0.3.0.tgz"
+      sha256 "d19cdcbfe7e7bdb5929205bfa19a01fa5753ed14565fd58db3ceae4375e83e96"
+    end
+    resource "node-runtime" do
+      url "https://nodejs.org/dist/v24.13.0/node-v24.13.0-darwin-arm64.tar.gz"
+      sha256 "d595961e563fcae057d4a0fb992f175a54d97fcc4a14dc2d474d92ddeea3b9f8"
+    end
+  end
+
+  on_intel do
+    resource "codex-auth" do
+      url "https://registry.npmjs.org/@loongphy/codex-auth-darwin-x64/-/codex-auth-darwin-x64-0.3.0.tgz"
+      sha256 "d2455c9729428256d84a80ad0ceeaa33af507cc9850e3e0835da420ab67f1e6c"
+    end
+    resource "node-runtime" do
+      url "https://nodejs.org/dist/v24.13.0/node-v24.13.0-darwin-x64.tar.gz"
+      sha256 "6f03c1b48ddbe1b129a6f8038be08e0899f05f17185b4d3e4350180ab669a7f3"
+    end
+  end
+
   def install
     # Keep the embedded runtime beside its launchers; no global runtime upgrades.
     libexec.install Dir["*"]
+    resource("codex-auth").stage do
+      (libexec/"auth").install "bin"
+      (pkgshare/"licenses").install "LICENSE" => "codex-auth-LICENSE"
+    end
+    resource("node-runtime").stage do
+      (libexec/"node/bin").install "bin/node"
+      (pkgshare/"licenses").install "LICENSE" => "node-LICENSE"
+    end
     %w[runlobby rlb codex-lobby cxl codex-switch codex-vpn codex-proxy].each do |name|
-      bin.install_symlink libexec/name
+      (bin/name).write <<~SH
+        #!/bin/sh
+        export PATH="#{libexec}/auth/bin:#{libexec}/node/bin:$PATH"
+        export CODEX_AUTH_NODE_EXECUTABLE="#{libexec}/node/bin/node"
+        exec "#{libexec}/#{name}" "$@"
+      SH
+      (bin/name).chmod 0755
     end
   end
 
@@ -47,6 +84,13 @@ class Runlobby < Formula
     ENV["CODEX_HOME"] = (testpath/"codex").to_s
     ENV["RUNLOBBY_LANG"] = "en"
     (testpath/"codex").mkpath
+    # Old global tools must not hide the original account registry or trigger upgrades.
+    (testpath/"old-tools").mkpath
+    %w[codex-auth node].each do |name|
+      (testpath/"old-tools"/name).write "#!/bin/sh\nexit 42\n"
+      (testpath/"old-tools"/name).chmod 0755
+    end
+    ENV.prepend_path "PATH", testpath/"old-tools"
     assert_match version.to_s, shell_output("#{bin}/codex-switch --version")
     assert_match version.to_s, shell_output("#{bin}/runlobby --version")
     assert_match version.to_s, shell_output("#{bin}/rlb --version")
