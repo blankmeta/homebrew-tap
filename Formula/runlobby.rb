@@ -1,7 +1,6 @@
 class Runlobby < Formula
   desc "Codex and Claude accounts, limits and sessions in one terminal menu"
   homepage "https://github.com/blankmeta/runlobby"
-  version "1.4.1"
   license "MIT"
   version_scheme 1
 
